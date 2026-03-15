@@ -9,6 +9,7 @@
 <title>フセンジャッジ</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23f59e0b' rx='20' width='100' height='100'/><text x='50' y='68' text-anchor='middle' font-size='50'>📋</text></svg>">
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -358,7 +359,7 @@ html,body{
   <!-- Processing Overlay -->
   <div class="processing" id="processing">
     <div class="spinner"></div>
-    <div class="processing-text">読み取り中...</div>
+    <div class="processing-text" id="processingText">読み取り中...</div>
     <div class="processing-step">
       <div class="step-item active" id="step1"><span class="step-dot"></span>付箋の色を検出</div>
       <div class="step-item" id="step2"><span class="step-dot"></span>テキストを読み取り</div>
@@ -638,40 +639,111 @@ function rgbToHsv(r, g, b) {
   return [h, s, v];
 }
 
-// ==================== OCR (Lightweight) ====================
-// Use canvas-based preprocessing for better contrast
+// ==================== OCR (Tesseract.js) ====================
+let tesseractWorker = null;
+let tesseractReady = false;
+let tesseractLoading = false;
+
+async function initTesseract() {
+  if (tesseractReady || tesseractLoading) return;
+  tesseractLoading = true;
+  try {
+    tesseractWorker = await Tesseract.createWorker('jpn', 1, {
+      logger: m => {
+        if (m.status === 'recognizing text') {
+          const pct = Math.round((m.progress || 0) * 100);
+          const s2 = document.getElementById('step2');
+          if (s2) s2.querySelector('.step-dot').nextSibling.textContent = `テキストを読み取り (${pct}%)`;
+        }
+      }
+    });
+    await tesseractWorker.setParameters({
+      tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
+    });
+    tesseractReady = true;
+    console.log('Tesseract.js ready');
+  } catch (e) {
+    console.warn('Tesseract init failed:', e);
+    tesseractReady = false;
+  }
+  tesseractLoading = false;
+}
+
+// 付箋の色に応じた前処理でOCR精度向上
 function preprocessForOCR(canvas, detectedColor) {
   const ctx = canvas.getContext('2d');
   const w = canvas.width, h = canvas.height;
   const imgData = ctx.getImageData(0, 0, w, h);
   const d = imgData.data;
 
-  // Create a new canvas for processed image
   const procCanvas = document.createElement('canvas');
   procCanvas.width = w; procCanvas.height = h;
   const pCtx = procCanvas.getContext('2d');
   const procData = pCtx.createImageData(w, h);
   const pd = procData.data;
 
+  // 1) 色チャネル選択でグレースケール化
+  const grayValues = new Uint8Array(w * h);
   for (let i = 0; i < d.length; i += 4) {
     let gray;
     if (detectedColor === 'red') {
-      // Use green channel for red background
-      gray = d[i + 1];
+      gray = d[i + 1]; // 緑チャネル（赤背景でコントラスト良好）
     } else if (detectedColor === 'blue') {
-      // Use red channel for blue background
-      gray = d[i];
+      gray = d[i]; // 赤チャネル（青背景でコントラスト良好）
     } else {
       gray = 0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2];
     }
-    // Increase contrast
-    gray = gray < 128 ? Math.max(0, gray * 0.5) : Math.min(255, gray * 1.3 + 30);
-    pd[i] = pd[i+1] = pd[i+2] = gray;
-    pd[i+3] = 255;
+    grayValues[i / 4] = gray;
+  }
+
+  // 2) 大津の二値化で閾値算出
+  const histogram = new Array(256).fill(0);
+  for (let i = 0; i < grayValues.length; i++) histogram[grayValues[i]]++;
+  let total = grayValues.length, sum = 0;
+  for (let i = 0; i < 256; i++) sum += i * histogram[i];
+  let sumB = 0, wB = 0, maxVar = 0, threshold = 128;
+  for (let t = 0; t < 256; t++) {
+    wB += histogram[t]; if (wB === 0) continue;
+    const wF = total - wB; if (wF === 0) break;
+    sumB += t * histogram[t];
+    const mB = sumB / wB, mF = (sum - sumB) / wF;
+    const v = wB * wF * (mB - mF) * (mB - mF);
+    if (v > maxVar) { maxVar = v; threshold = t; }
+  }
+
+  // 3) 二値化適用（コントラスト強調）
+  for (let i = 0; i < grayValues.length; i++) {
+    const val = grayValues[i] < threshold ? 0 : 255;
+    const pi = i * 4;
+    pd[pi] = pd[pi+1] = pd[pi+2] = val;
+    pd[pi+3] = 255;
   }
 
   pCtx.putImageData(procData, 0, 0);
   return procCanvas;
+}
+
+async function runOCR(canvas, detectedColor) {
+  if (!tesseractReady) {
+    await initTesseract();
+  }
+  if (!tesseractReady) return '';
+
+  try {
+    // 前処理済み画像でOCR
+    const processed = preprocessForOCR(canvas, detectedColor);
+    const { data } = await tesseractWorker.recognize(processed.toDataURL('image/png'));
+    // テキストをクリーンアップ
+    let text = (data.text || '').trim();
+    text = text.replace(/[\n\r]+/g, ' ').replace(/\s+/g, ' ');
+    // 短すぎるor記号だけなら空文字扱い
+    const cleaned = text.replace(/[^\p{L}\p{N}]/gu, '');
+    if (cleaned.length < 2) return '';
+    return text;
+  } catch (e) {
+    console.warn('OCR error:', e);
+    return '';
+  }
 }
 
 // ==================== KEYWORD MATCHING ====================
@@ -758,42 +830,59 @@ async function processImage(canvas) {
   s1.className = 'step-item done';
   s2.className = 'step-item active';
 
-  // Step 2: OCR attempt (simplified - extract text features)
-  await sleep(400);
+  // Step 2: OCR
   let ocrText = '';
-  // Tesseract.js would go here in production
-  // For now, we rely on color detection as primary
+  try {
+    ocrText = await runOCR(canvas, colorResult.color);
+  } catch (e) {
+    console.warn('OCR failed:', e);
+  }
   s2.className = 'step-item done';
+  s2.innerHTML = `<span class="step-dot"></span>テキストを読み取り${ocrText ? ' ✓' : ''}`;
   s3.className = 'step-item active';
 
   // Step 3: Classification
-  await sleep(300);
+  await sleep(200);
   let type, confidence, category, matchItem;
+  let colorConfidence = 0;
 
+  // 色による大分類
   if (colorResult.color === 'red') {
     type = 'temodori';
-    confidence = Math.round(colorResult.confidence * 100);
+    colorConfidence = colorResult.confidence;
   } else if (colorResult.color === 'blue') {
     type = 'temachi';
-    confidence = Math.round(colorResult.confidence * 100);
+    colorConfidence = colorResult.confidence;
   } else {
-    // Unknown color - ask user
     type = 'unknown';
-    confidence = 0;
+    colorConfidence = 0;
   }
 
-  // If we have OCR text, try keyword matching
+  // キーワードマッチングでカテゴリ特定
+  let textScore = 0;
   if (ocrText) {
     const match = matchKeywords(ocrText);
-    if (match && match.score > 0.3) {
+    if (match && match.score > 0.15) {
       category = match.category;
       matchItem = match.item;
-      // If text strongly suggests different type, note it
+      textScore = match.score;
+      // 色が不明の場合、テキストから判定
+      if (type === 'unknown') {
+        type = match.type;
+      }
     }
   }
 
+  // 信頼度統合 (色60% + テキスト40%)
+  if (type !== 'unknown') {
+    confidence = Math.round(Math.min((colorConfidence * 0.6 + textScore * 0.4) * 100, 100));
+    confidence = Math.max(confidence, Math.round(colorConfidence * 100));
+  } else {
+    confidence = 0;
+  }
+
   s3.className = 'step-item done';
-  await sleep(200);
+  await sleep(150);
   proc.classList.remove('active');
 
   // Show result
@@ -820,7 +909,7 @@ function showResult(result) {
     html += `<img class="result-image" src="${result.imageData}" alt="撮影画像">`;
   }
 
-  // OCR text (if available)
+  // OCR text or manual input
   if (result.ocrText) {
     html += `<div class="result-ocr">
       <div class="result-ocr-label">
@@ -828,6 +917,22 @@ function showResult(result) {
         読み取りテキスト
       </div>
       <div class="result-ocr-text">「${result.ocrText}」</div>
+    </div>`;
+  } else if (!isUnknown) {
+    html += `<div class="result-ocr">
+      <div class="result-ocr-label">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+        文字が読み取れませんでした
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <input type="text" id="manualText" placeholder="付箋の内容を入力..."
+          style="flex:1;padding:12px 14px;border-radius:var(--radius-sm);border:1px solid var(--card-border);background:var(--bg);color:var(--text);font-size:16px;outline:none"
+          onkeydown="if(event.key==='Enter')reclassifyManual()">
+        <button onclick="reclassifyManual()"
+          style="padding:12px 18px;border-radius:var(--radius-sm);border:none;background:var(--accent);color:#000;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap">
+          判定
+        </button>
+      </div>
     </div>`;
   }
 
@@ -929,6 +1034,31 @@ function manualSelect(type) {
   result.type = type;
   result.confidence = 100;
   showResult(result);
+}
+
+function reclassifyManual() {
+  const input = document.getElementById('manualText');
+  if (!input) return;
+  const text = input.value.trim();
+  if (!text) return;
+  const result = window._currentResult;
+  result.ocrText = text;
+  // キーワードマッチングで再判定
+  const match = matchKeywords(text);
+  if (match && match.score > 0.15) {
+    result.category = match.category;
+    result.matchItem = match.item;
+    // テキストが別タイプを示唆する場合でも色判定を優先
+  }
+  // 履歴の最新エントリを更新
+  if (history.length > 0) {
+    history[0].ocrText = text;
+    history[0].category = result.category || '';
+    history[0].matchItem = result.matchItem || '';
+    saveHistory();
+  }
+  showResult(result);
+  showToast('テキストから分類しました');
 }
 
 function switchType() {
@@ -1055,6 +1185,8 @@ function showToast(msg) {
 window.addEventListener('DOMContentLoaded', () => {
   updateBadge();
   initCamera();
+  // バックグラウンドでTesseract.jsの日本語モデルを先読み
+  setTimeout(() => initTesseract(), 1000);
 });
 </script>
 </body>
