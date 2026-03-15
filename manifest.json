@@ -1,0 +1,17 @@
+{
+  "name": "フセンジャッジ",
+  "short_name": "フセンジャッジ",
+  "description": "付箋の手戻り・手待ちをAI判定",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%230f172a' width='512' height='512' rx='80'/><rect x='100' y='80' width='200' height='200' rx='10' fill='%23dc2626' transform='rotate(-5 200 180)'/><rect x='220' y='240' width='200' height='200' rx='10' fill='%232563eb' transform='rotate(3 320 340)'/><text x='256' y='300' text-anchor='middle' font-size='120' fill='white'>📋</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
