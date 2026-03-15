@@ -481,12 +481,18 @@ function capture() {
   const canvas = document.getElementById('canvas');
   const w = video.videoWidth || 1280;
   const h = video.videoHeight || 720;
-  canvas.width = w; canvas.height = h;
-  canvas.getContext('2d').drawImage(video, 0, 0, w, h);
+  // 長辺1024pxにリサイズ（API転送量削減）
+  let rw = w, rh = h;
+  if (rw > 1024 || rh > 1024) {
+    if (rw > rh) { rh = Math.round(rh * 1024 / rw); rw = 1024; }
+    else { rw = Math.round(rw * 1024 / rh); rh = 1024; }
+  }
+  canvas.width = rw; canvas.height = rh;
+  canvas.getContext('2d').drawImage(video, 0, 0, rw, rh);
   document.getElementById('flash').classList.add('active');
   setTimeout(() => document.getElementById('flash').classList.remove('active'), 350);
   if (navigator.vibrate) navigator.vibrate(50);
-  currentImageData = canvas.toDataURL('image/jpeg', 0.8);
+  currentImageData = canvas.toDataURL('image/jpeg', 0.85);
   processImage();
 }
 
@@ -499,11 +505,11 @@ function handleFile(e) {
     img.onload = function() {
       const canvas = document.getElementById('canvas');
       let w = img.width, h = img.height;
-      if (w > 1600) { h = h * 1600 / w; w = 1600; }
-      if (h > 1600) { w = w * 1600 / h; h = 1600; }
+      if (w > 1024) { h = Math.round(h * 1024 / w); w = 1024; }
+      if (h > 1024) { w = Math.round(w * 1024 / h); h = 1024; }
       canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      currentImageData = canvas.toDataURL('image/jpeg', 0.8);
+      currentImageData = canvas.toDataURL('image/jpeg', 0.85);
       processImage();
     };
     img.src = ev.target.result;
@@ -587,13 +593,53 @@ ${KB_PROMPT}
   }
 
   const data = await res.json();
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  console.log('Gemini raw response:', JSON.stringify(data));
 
-  // Extract JSON from response
-  const jsonMatch = text.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new Error('AIの応答を解析できませんでした');
+  // エラーレスポンスチェック
+  if (data.error) {
+    throw new Error(data.error.message || 'Gemini APIエラー');
+  }
 
-  return JSON.parse(jsonMatch[0]);
+  // candidates配列の安全チェック
+  if (!data.candidates || data.candidates.length === 0) {
+    const blockReason = data.promptFeedback?.blockReason;
+    if (blockReason) {
+      throw new Error(`リクエストがブロックされました: ${blockReason}`);
+    }
+    throw new Error('AIからの応答がありませんでした');
+  }
+
+  const finishReason = data.candidates[0].finishReason;
+  if (finishReason && finishReason !== 'STOP' && finishReason !== 'MAX_TOKENS') {
+    throw new Error(`応答が中断されました: ${finishReason}`);
+  }
+
+  const text = data.candidates[0]?.content?.parts?.[0]?.text || '';
+  console.log('Gemini text:', text);
+
+  if (!text) throw new Error('AIからのテキスト応答が空でした');
+
+  // JSON部分を抽出（```json ... ``` またはそのまま）
+  let jsonStr = '';
+  const fenceMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (fenceMatch) {
+    jsonStr = fenceMatch[1].trim();
+  } else {
+    // 最も外側の { } を探す
+    const start = text.indexOf('{');
+    const end = text.lastIndexOf('}');
+    if (start !== -1 && end > start) {
+      jsonStr = text.substring(start, end + 1);
+    }
+  }
+
+  if (!jsonStr) throw new Error('AIの応答からJSONを抽出できませんでした:\n' + text.substring(0, 200));
+
+  try {
+    return JSON.parse(jsonStr);
+  } catch (parseErr) {
+    throw new Error('JSONの解析に失敗しました:\n' + jsonStr.substring(0, 200));
+  }
 }
 
 // ==================== PROCESS IMAGE ====================
@@ -629,13 +675,31 @@ async function processImage() {
   } catch (e) {
     proc.classList.remove('active');
     console.error('Gemini error:', e);
-    showToast(e.message || 'エラーが発生しました');
 
     if (e.message?.includes('APIキー')) {
       apiKey = '';
       localStorage.removeItem('fj_apikey');
       showScreen('screenSetup');
+      showToast('APIキーが無効です');
+      return;
     }
+
+    // エラー詳細を結果画面に表示
+    showScreen('screenResult');
+    const body = document.getElementById('resultBody');
+    body.innerHTML = `
+      ${currentImageData ? `<img class="result-image" src="${currentImageData}" alt="撮影画像">` : ''}
+      <div style="text-align:center;padding:24px 0">
+        <div style="font-size:48px;margin-bottom:12px">⚠️</div>
+        <div style="font-size:18px;font-weight:700;margin-bottom:12px;color:var(--red-light)">読み取りに失敗しました</div>
+        <div style="background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius-sm);padding:16px;text-align:left;margin-bottom:16px">
+          <div style="font-size:12px;color:var(--text3);margin-bottom:6px">エラー詳細</div>
+          <div style="font-size:13px;color:var(--red-light);word-break:break-all;white-space:pre-wrap">${e.message || '不明なエラー'}</div>
+        </div>
+        <div style="font-size:14px;color:var(--text2);line-height:1.6">
+          付箋をもう少し近くで撮影するか、<br>明るい場所で試してみてください。
+        </div>
+      </div>`;
   }
 }
 
