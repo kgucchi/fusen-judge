@@ -977,6 +977,13 @@ function showToast(msg) {
 
 // ==================== INIT ====================
 window.addEventListener('DOMContentLoaded', () => {
+  // ?reset でAPIキーを強制クリア
+  if (location.search.includes('reset')) {
+    localStorage.removeItem('fj_apikey');
+    apiKey = '';
+    history.replaceState(null, '', location.pathname);
+  }
+
   updateBadge();
   if (apiKey) {
     document.getElementById('screenSetup').classList.add('hidden');
