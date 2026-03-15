@@ -8,8 +8,6 @@
 <meta name="theme-color" content="#0f172a">
 <title>フセンジャッジ</title>
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23f59e0b' rx='20' width='100' height='100'/><text x='50' y='68' text-anchor='middle' font-size='50'>📋</text></svg>">
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -31,7 +29,6 @@ html,body{
   -webkit-text-size-adjust:100%;
 }
 
-/* ===== Screens ===== */
 .screen{
   position:absolute;inset:0;
   display:flex;flex-direction:column;
@@ -43,7 +40,6 @@ html,body{
 .screen.hidden{pointer-events:none;opacity:0;transform:translateX(100%)}
 .screen.hidden-left{pointer-events:none;opacity:0;transform:translateX(-30%)}
 
-/* ===== Header ===== */
 .header{
   display:flex;align-items:center;justify-content:space-between;
   padding:12px 20px;min-height:56px;
@@ -70,7 +66,6 @@ html,body{
   display:inline-flex;align-items:center;justify-content:center;padding:0 6px;
 }
 
-/* ===== Camera Screen ===== */
 .camera-body{flex:1;display:flex;flex-direction:column;position:relative;overflow:hidden}
 .video-wrap{
   flex:1;position:relative;display:flex;align-items:center;justify-content:center;
@@ -81,16 +76,13 @@ html,body{
   position:absolute;width:72%;aspect-ratio:1.2;
   border:2.5px dashed rgba(255,255,255,.5);border-radius:12px;
   display:flex;align-items:center;justify-content:center;
-  transition:border-color .3s,box-shadow .3s;
-  pointer-events:none;
+  transition:border-color .3s,box-shadow .3s;pointer-events:none;
 }
-.guide-frame.detected{border-color:#22c55e;box-shadow:0 0 30px rgba(34,197,94,.2)}
 .guide-text{
   position:absolute;bottom:16px;
   background:rgba(0,0,0,.6);backdrop-filter:blur(8px);
   padding:8px 18px;border-radius:20px;
-  font-size:13px;color:rgba(255,255,255,.85);
-  pointer-events:none;white-space:nowrap;
+  font-size:13px;color:rgba(255,255,255,.85);pointer-events:none;white-space:nowrap;
 }
 .camera-controls{
   padding:20px 20px calc(20px + var(--safe-bottom));
@@ -100,8 +92,7 @@ html,body{
 }
 .btn-capture{
   width:76px;height:76px;border-radius:50%;border:4px solid var(--accent);
-  background:transparent;cursor:pointer;position:relative;
-  transition:transform .15s;
+  background:transparent;cursor:pointer;position:relative;transition:transform .15s;
 }
 .btn-capture::after{
   content:'';position:absolute;inset:6px;border-radius:50%;
@@ -113,8 +104,7 @@ html,body{
 .btn-gallery{
   background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);
   color:var(--text);padding:10px 20px;border-radius:25px;
-  font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px;
-  transition:background .2s;
+  font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .2s;
 }
 .btn-gallery:active{background:rgba(255,255,255,.2)}
 #fileInput{display:none}
@@ -126,7 +116,6 @@ html,body{
 .camera-hint svg{width:48px;height:48px;margin-bottom:12px;opacity:.4}
 .camera-hint p{font-size:14px;line-height:1.6}
 
-/* ===== Processing Overlay ===== */
 .processing{
   position:absolute;inset:0;z-index:100;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -141,18 +130,7 @@ html,body{
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 .processing-text{font-size:16px;color:var(--text2);text-align:center;line-height:1.6}
-.processing-step{
-  margin-top:16px;display:flex;flex-direction:column;gap:8px;align-items:center;
-}
-.step-item{
-  font-size:13px;color:var(--text3);display:flex;align-items:center;gap:8px;
-  transition:color .3s;
-}
-.step-item.active{color:var(--accent)}
-.step-item.done{color:#22c55e}
-.step-dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0}
 
-/* ===== Result Screen ===== */
 .result-body{
   flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
   padding:16px 20px calc(100px + var(--safe-bottom));
@@ -192,11 +170,10 @@ html,body{
   border-radius:var(--radius-sm);padding:16px;margin-bottom:16px;
 }
 .result-detail-row{
-  display:flex;justify-content:space-between;align-items:flex-start;
-  padding:8px 0;
+  display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;
 }
 .result-detail-row+.result-detail-row{border-top:1px solid var(--card-border)}
-.detail-label{font-size:13px;color:var(--text3);flex-shrink:0;width:80px}
+.detail-label{font-size:13px;color:var(--text3);flex-shrink:0;width:90px}
 .detail-value{font-size:15px;color:var(--text);text-align:right;flex:1}
 
 .btn-switch{
@@ -208,11 +185,10 @@ html,body{
 .btn-switch:active{background:rgba(255,255,255,.05);border-color:var(--text3)}
 .btn-switch .switch-hint{font-size:12px;color:var(--text3);margin-top:2px}
 
-.result-footer{
+.result-footer,.history-footer{
   position:fixed;bottom:0;left:0;right:0;
   padding:16px 20px calc(16px + var(--safe-bottom));
-  background:linear-gradient(to top,var(--bg) 70%,transparent);
-  z-index:10;
+  background:linear-gradient(to top,var(--bg) 70%,transparent);z-index:10;
 }
 .btn-next{
   width:100%;padding:18px;border:none;border-radius:var(--radius);
@@ -223,16 +199,8 @@ html,body{
 }
 .btn-next:active{transform:scale(.97)}
 
-/* ===== History Screen ===== */
-.history-body{
-  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  padding:16px 20px calc(100px + var(--safe-bottom));
-}
 .summary-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
-.summary-card{
-  border-radius:var(--radius-sm);padding:20px 16px;text-align:center;
-  border:1px solid;
-}
+.summary-card{border-radius:var(--radius-sm);padding:20px 16px;text-align:center;border:1px solid}
 .summary-card.temodori{background:var(--red-bg);border-color:rgba(220,38,38,.2)}
 .summary-card.temachi{background:var(--blue-bg);border-color:rgba(37,99,235,.2)}
 .summary-icon{font-size:24px;margin-bottom:4px}
@@ -243,22 +211,16 @@ html,body{
 .summary-unit{font-size:14px;font-weight:400;color:var(--text2)}
 
 .history-section-title{font-size:13px;color:var(--text3);margin-bottom:12px;padding-left:4px}
-
 .history-list{display:flex;flex-direction:column;gap:10px}
 .history-item{
   background:var(--card);border:1px solid var(--card-border);
   border-radius:var(--radius-sm);padding:14px 16px;
   display:flex;align-items:center;gap:14px;
-  cursor:pointer;transition:background .2s;
   border-left:4px solid;
 }
-.history-item:active{background:var(--bg3)}
 .history-item.temodori{border-left-color:var(--red)}
 .history-item.temachi{border-left-color:var(--blue)}
-.history-thumb{
-  width:48px;height:48px;border-radius:8px;object-fit:cover;flex-shrink:0;
-  background:var(--bg3);
-}
+.history-thumb{width:48px;height:48px;border-radius:8px;object-fit:cover;flex-shrink:0;background:var(--bg3)}
 .history-info{flex:1;min-width:0}
 .history-type{font-size:12px;font-weight:700;margin-bottom:2px}
 .history-item.temodori .history-type{color:var(--red-light)}
@@ -267,28 +229,17 @@ html,body{
 .history-cat{font-size:12px;color:var(--text3);margin-top:2px}
 .history-time{font-size:12px;color:var(--text3);flex-shrink:0}
 
+.history-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 20px calc(100px + var(--safe-bottom))}
+
 .empty-state{text-align:center;padding:60px 20px;color:var(--text3)}
 .empty-state svg{width:64px;height:64px;margin-bottom:16px;opacity:.3}
 .empty-state p{font-size:15px;line-height:1.6}
 
-.history-footer{
-  position:fixed;bottom:0;left:0;right:0;
-  padding:16px 20px calc(16px + var(--safe-bottom));
-  background:linear-gradient(to top,var(--bg) 70%,transparent);z-index:10;
-}
-
-/* ===== Canvas (hidden) ===== */
 #canvas{display:none}
-
-/* ===== Flash effect ===== */
-.flash{
-  position:fixed;inset:0;background:#fff;z-index:200;
-  opacity:0;pointer-events:none;
-}
+.flash{position:fixed;inset:0;background:#fff;z-index:200;opacity:0;pointer-events:none}
 .flash.active{animation:flash .3s ease-out}
 @keyframes flash{0%{opacity:.8}100%{opacity:0}}
 
-/* ===== Toast ===== */
 .toast{
   position:fixed;top:calc(16px + var(--safe-top));left:50%;transform:translateX(-50%) translateY(-100px);
   background:var(--card);border:1px solid var(--card-border);
@@ -298,10 +249,47 @@ html,body{
 }
 .toast.show{transform:translateX(-50%) translateY(0)}
 
-/* ===== Landscape warning ===== */
-@media(orientation:landscape) and (max-height:500px){
-  .landscape-warn{display:flex!important}
+/* Setup screen */
+.setup-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px}
+.setup-logo{font-size:64px;margin-bottom:16px}
+.setup-title{font-size:28px;font-weight:900;margin-bottom:8px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
 }
+.setup-sub{font-size:14px;color:var(--text2);margin-bottom:32px;text-align:center;line-height:1.6}
+.setup-input-wrap{width:100%;max-width:360px;margin-bottom:16px}
+.setup-label{font-size:13px;color:var(--text3);margin-bottom:8px;display:block}
+.setup-input{
+  width:100%;padding:14px 16px;border-radius:var(--radius-sm);
+  border:1px solid var(--card-border);background:var(--card);
+  color:var(--text);font-size:16px;outline:none;
+  transition:border-color .2s;
+}
+.setup-input:focus{border-color:var(--accent)}
+.setup-btn{
+  width:100%;max-width:360px;padding:16px;border:none;border-radius:var(--radius);
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#000;font-size:17px;font-weight:700;cursor:pointer;
+  margin-top:8px;transition:transform .15s;
+}
+.setup-btn:active{transform:scale(.97)}
+.setup-btn:disabled{opacity:.4;cursor:not-allowed}
+.setup-hint{font-size:12px;color:var(--text3);margin-top:16px;text-align:center;line-height:1.6;max-width:360px}
+.setup-error{color:var(--red-light);font-size:13px;margin-top:8px;display:none}
+
+.candidates-list{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.candidate-item{
+  padding:10px 12px;border-radius:8px;cursor:pointer;
+  background:rgba(255,255,255,.04);border:1px solid var(--card-border);
+  transition:all .2s;display:flex;justify-content:space-between;align-items:center;
+}
+.candidate-item:active{background:rgba(255,255,255,.08)}
+.candidate-item.selected{border-color:var(--accent);background:rgba(245,158,11,.08)}
+.candidate-name{font-size:14px;color:var(--text)}
+.candidate-cat{font-size:12px;color:var(--text3)}
+.candidate-score{font-size:12px;color:var(--accent);font-weight:600}
+
+@media(orientation:landscape) and (max-height:500px){.landscape-warn{display:flex!important}}
 .landscape-warn{
   display:none;position:fixed;inset:0;z-index:999;
   background:var(--bg);align-items:center;justify-content:center;
@@ -311,20 +299,34 @@ html,body{
 </head>
 <body>
 
-<!-- Landscape Warning -->
 <div class="landscape-warn">
   <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="12" width="36" height="24" rx="3"/><path d="M24 32v4M20 36h8"/></svg>
   <p>縦向きでご利用ください</p>
 </div>
-
-<!-- Flash Effect -->
 <div class="flash" id="flash"></div>
-
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
+<!-- ==================== SETUP SCREEN ==================== -->
+<div class="screen" id="screenSetup">
+  <div class="setup-body">
+    <div class="setup-logo">📋</div>
+    <div class="setup-title">フセンジャッジ</div>
+    <div class="setup-sub">付箋の手戻り・手待ちをAIが瞬時に判定<br>PSC勉強会グループディスカッション用</div>
+    <div class="setup-input-wrap">
+      <label class="setup-label">Gemini APIキー</label>
+      <input type="password" class="setup-input" id="apiKeyInput" placeholder="AIza...">
+      <div class="setup-error" id="setupError"></div>
+    </div>
+    <button class="setup-btn" id="setupBtn" onclick="saveApiKey()">はじめる</button>
+    <div class="setup-hint">
+      APIキーはこの端末にのみ保存されます。<br>
+      <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--accent)">Google AI Studio</a> で無料取得できます。
+    </div>
+  </div>
+</div>
+
 <!-- ==================== CAMERA SCREEN ==================== -->
-<div class="screen" id="screenCamera">
+<div class="screen hidden" id="screenCamera">
   <div class="header">
     <div class="header-title">フセンジャッジ</div>
     <button class="header-btn" onclick="showHistory()">
@@ -337,7 +339,7 @@ html,body{
     <div class="video-wrap">
       <video id="video" autoplay playsinline muted></video>
       <div class="guide-frame" id="guideFrame">
-        <span class="guide-text" id="guideText">付箋をここに合わせてね</span>
+        <span class="guide-text">付箋をここに合わせてね</span>
       </div>
       <div class="camera-hint" id="cameraHint" style="display:none">
         <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/><circle cx="12" cy="13.5" r="3.5"/></svg>
@@ -355,16 +357,9 @@ html,body{
       <input type="file" id="fileInput" accept="image/*" onchange="handleFile(event)">
     </div>
   </div>
-
-  <!-- Processing Overlay -->
   <div class="processing" id="processing">
     <div class="spinner"></div>
-    <div class="processing-text" id="processingText">読み取り中...</div>
-    <div class="processing-step">
-      <div class="step-item active" id="step1"><span class="step-dot"></span>付箋の色を検出</div>
-      <div class="step-item" id="step2"><span class="step-dot"></span>テキストを読み取り</div>
-      <div class="step-item" id="step3"><span class="step-dot"></span>分類を判定</div>
-    </div>
+    <div class="processing-text" id="processingText">Gemini AIが解析中...</div>
   </div>
 </div>
 
@@ -378,9 +373,7 @@ html,body{
     <div class="header-title">判定結果</div>
     <div style="width:60px"></div>
   </div>
-  <div class="result-body" id="resultBody">
-    <!-- Filled by JS -->
-  </div>
+  <div class="result-body" id="resultBody"></div>
   <div class="result-footer">
     <button class="btn-next" onclick="backToCamera()">
       <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/><circle cx="12" cy="13.5" r="3.5"/></svg>
@@ -397,13 +390,9 @@ html,body{
       戻る
     </button>
     <div class="header-title">撮影履歴</div>
-    <button class="header-btn" id="btnClearHistory" onclick="clearHistory()" style="color:var(--red-light);display:none">
-      クリア
-    </button>
+    <button class="header-btn" id="btnClearHistory" onclick="clearHistory()" style="color:var(--red-light);display:none">クリア</button>
   </div>
-  <div class="history-body" id="historyBody">
-    <!-- Filled by JS -->
-  </div>
+  <div class="history-body" id="historyBody"></div>
   <div class="history-footer">
     <button class="btn-next" onclick="backToCamera()">
       <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/><circle cx="12" cy="13.5" r="3.5"/></svg>
@@ -415,114 +404,57 @@ html,body{
 <canvas id="canvas"></canvas>
 
 <script>
-// ==================== KNOWLEDGE BASE ====================
-const KB = {
-  temodori: {
-    name: '手戻り',
-    sub: '（やり直し）',
-    categories: {
-      '図面・設計': [
-        '図面の寸法が現場と合わない','図面が古いバージョンのまま','設備図と建築図の不整合',
-        '納まりが考慮されていない','現場を見ずに設計している','図面の差し替えが多すぎる',
-        '詳細図が出てこない','施工図の承認が遅い','図面の読み間違い','設計変更の連絡漏れ'
-      ],
-      '指示・情報伝達': [
-        '口頭指示で記録がない','変更指示が現場に届かない','朝礼で聞いてない職人がいる',
-        '職長への伝達が曖昧','監督の指示が二転三転','元請と専門の認識ズレ',
-        '前工程からの申し送りなし','関係者への周知が不十分','指示内容を勘違い','LINEメールを見ていない'
-      ],
-      '材料・資機材': [
-        '材料の発注ミス','サンプル品と実物が違う','材料の納期遅れ','色番品番の間違い',
-        '数量が足りない','間違った材料を使った','材料の検品不足','代替品の確認不足',
-        '材料の保管場所が悪い','先行手配していなかった'
-      ],
-      '技術・施工品質': [
-        '墨出しの間違い','施工要領書を読んでいない','未熟な職人に任せた','施工手順を間違えた',
-        '品質基準を勘違い','養生期間が不足','下地処理が不十分','初めての工法で失敗',
-        '工具道具の選定ミス','安全優先で手順を変えた'
-      ],
-      '工程・段取り': [
-        '前工程が終わっていない','工程の見通しが甘かった','職人の手配ミス','他業種との取り合い不調整',
-        '段取り替えのタイミング悪い','同時施工で干渉した','準備不足で着手できない','無理な工程に従った',
-        '休日夜間作業の調整不足','先行してやりすぎた'
-      ],
-      '検査・承認': [
-        '施主検査でやり直し指示','中間検査を受けずに進めた','監理者の確認待ちで手戻り',
-        '竣工間際の追加指摘','写真撮影のタイミング逃した','隠蔽前の検査忘れ',
-        '検査基準を満たしていない','サンプル承認前に施工した','是正指摘への対応遅れ','元請検査の指摘事項多数'
-      ],
-      '人間関係・コミュニケーション': [
-        '職人同士の連携不足','監督が現場にいない','言いにくい雰囲気がある','ベテランの思い込み',
-        '若手が質問しづらい','業者間の押し付け合い','報連相の不足','職長が職人を把握していない',
-        '元請との関係が悪い','協力会社が多すぎて混乱'
-      ],
-      '外部要因': [
-        '雨で養生が飛んだ','施主の追加要望','近隣クレームで変更','天候不良で工程遅延',
-        '施主の仕様変更','法規制の変更','既存建物の図面相違','地中埋設物が出てきた',
-        '近隣との取り決め変更','資材入荷遅延'
-      ]
-    }
-  },
-  temachi: {
-    name: '手待ち',
-    sub: '（待ち時間）',
-    categories: {
-      '前工程の遅れ': [
-        '前職が全然終わってない','コンクリート養生待ち','躯体の精度出しが長引く','前の業者が人手不足',
-        '墨出しがまだ','下地の不陸調整中','前工程のやり直し発生','鉄筋の検査待ち',
-        '型枠バラシ待ち','前職の材料待ち'
-      ],
-      '資材・機材の問題': [
-        '材料がまだ届かない','発注ミスで材料違い','納期遅延の連絡なし','材料の数量不足',
-        '機械が故障中','レンタル機械が来ない','材料の検品で不良発覚','図面変更で材料作り直し',
-        'メーカー欠品','運送会社の遅延'
-      ],
-      '揚重・運搬': [
-        'タワクレ他職が使用中','揚重計画の調整つかず','エレベーター他職と競合','荷揚げ順番待ち',
-        'クレーンの段取り待ち','仮設通路が塞がってる','重機の移動待ち','揚重時間の割り振り遅れ',
-        'リフト点検で使用不可','荷揚げ業者の手配ミス'
-      ],
-      '検査・承認待ち': [
-        '監督の検査待ち','施主検査の日程未定','設計事務所の確認待ち','写真撮影待ち',
-        '官庁検査の日程調整中','品質検査の結果待ち','サンプル承認下りず','中間検査の段取り待ち'
-      ],
-      '指示・情報待ち': [
-        '監督が現場にいない','施工図がまだ上がらない','指示が二転三転','詳細図面が未着',
-        '変更内容の連絡待ち','朝礼での指示なし','納まり確認の返事待ち','メーカー回答待ち',
-        '寸法の最終確認待ち','職長会議の決定待ち'
-      ],
-      '他職種との調整': [
-        '取り合い調整がつかない','先行配管が邪魔','電気と設備で場所競合','作業エリアが重複',
-        '他職の段取り優先された','足場の共用調整つかず','他職の騒音で作業できず','スペース譲り合い',
-        '施工順序の調整難航','他職との打合せ待ち'
-      ],
-      '天候・安全規制': [
-        '雨で作業中止','強風でクレーン使えず','暑さで作業時間制限','雷注意報で待機',
-        '台風接近で養生作業','近隣クレームで作業停止','騒音規制の時間帯','粉塵対策で養生待ち',
-        '安全パトロールで中断'
-      ],
-      '人員・配置': [
-        '職人の人数が足りない','応援職人が来ない','熟練工が休み','新人だけで進まない',
-        '複数現場の掛け持ち','職長が別現場対応中','人工の割り振りミス','急な欠員で人手不足',
-        '他現場へ人員移動','協力会社の手配遅れ'
-      ]
-    }
-  }
-};
+// ==================== KNOWLEDGE BASE (for prompt) ====================
+const KB_PROMPT = `
+## 手戻り（やり直し）の原因 8分類
+1. 図面・設計: 図面の寸法が現場と合わない、設備図と建築図の不整合、図面が古いバージョン、納まり未考慮、図面差し替え多すぎ、詳細図が出ない、施工図の承認遅い、図面の読み間違い、設計変更の連絡漏れ
+2. 指示・情報伝達: 口頭指示で記録なし、変更指示が届かない、朝礼で聞いてない、職長への伝達が曖昧、監督の指示が二転三転、元請と専門の認識ズレ、申し送りなし、周知不十分、指示を勘違い、LINE・メール未確認
+3. 材料・資機材: 発注ミス、サンプルと実物の相違、納期遅れ、色番・品番間違い、数量不足、間違った材料使用、検品不足、代替品確認不足、保管場所が悪い、先行手配なし
+4. 技術・施工品質: 墨出し間違い、施工要領書未読、未熟な職人、施工手順ミス、品質基準勘違い、養生期間不足、下地処理不十分、初めての工法で失敗、工具選定ミス、安全優先で手順変更
+5. 工程・段取り: 前工程未完了、工程見通し甘い、職人手配ミス、他業種との取り合い不調整、段取り替えタイミング悪い、同時施工で干渉、準備不足、無理な工程、休日夜間作業調整不足、先行してやりすぎ
+6. 検査・承認: 施主検査でやり直し指示、中間検査未実施、監理者確認待ちで手戻り、竣工間際の追加指摘、写真撮影タイミング逃し、隠蔽前検査忘れ、検査基準未達、サンプル承認前施工、是正対応遅れ、元請検査指摘多数
+7. 人間関係・コミュニケーション: 職人同士連携不足、監督不在、言いにくい雰囲気、ベテラン思い込み、若手が質問しづらい、業者間押し付け合い、報連相不足、職長が職人未把握、元請との関係悪い、協力会社多すぎ
+8. 外部要因: 雨で養生飛んだ、施主追加要望、近隣クレームで変更、天候不良、施主仕様変更、法規制変更、既存建物の図面相違、地中埋設物、近隣取り決め変更、資材入荷遅延
 
-// 現場あるある（手戻りに近い）
-const ARUARU = [
-  '聞いてないよが口癖','親方と監督の指示が違う','前の現場のやり方でやった',
-  '図面より現場を信じた','急いでやって間違えた','確認したつもりだった',
-  '他の業者がやると思った','とりあえずやっちゃった','休憩後に指示を忘れた',
-  'ベテランに任せたら古い方法','新人が勝手に判断した','写真だけ見て施工した',
-  '元請の担当者が変わった','協力業者への説明不足','安全管理で一時中断後のミス'
-];
+## 手待ち（待ち時間）の原因 8分類
+1. 前工程の遅れ: 前職が終わってない、コンクリート養生待ち、躯体精度出し長引く、前の業者人手不足、墨出しがまだ、下地不陸調整中、前工程やり直し、鉄筋検査待ち、型枠バラシ待ち、前職の材料待ち
+2. 資材・機材の問題: 材料未着、発注ミスで材料違い、納期遅延連絡なし、材料数量不足、機械故障中、レンタル機械来ない、検品で不良発覚、図面変更で材料作り直し、メーカー欠品、運送遅延
+3. 揚重・運搬: タワクレ他職使用中、揚重計画調整つかず、エレベーター競合、荷揚げ順番待ち、クレーン段取り待ち、仮設通路塞がり、重機移動待ち、揚重時間割り振り遅れ、リフト点検で使用不可、荷揚げ業者手配ミス
+4. 検査・承認待ち: 監督検査待ち、施主検査日程未定、設計事務所確認待ち、写真撮影待ち、官庁検査日程調整中、品質検査結果待ち、サンプル承認下りず、中間検査段取り待ち
+5. 指示・情報待ち: 監督が現場にいない、施工図が上がらない、指示二転三転、詳細図面未着、変更内容連絡待ち、朝礼で指示なし、納まり確認返事待ち、メーカー回答待ち、寸法最終確認待ち、職長会議決定待ち
+6. 他職種との調整: 取り合い調整つかない、先行配管邪魔、電気と設備で場所競合、作業エリア重複、他職段取り優先、足場共用調整つかず、他職騒音で作業不可、スペース譲り合い、施工順序調整難航、他職との打合せ待ち
+7. 天候・安全規制: 雨で作業中止、強風でクレーン使えず、暑さで作業時間制限、雷注意報で待機、台風接近で養生、近隣クレームで停止、騒音規制時間帯、粉塵対策養生待ち、安全パトロールで中断
+8. 人員・配置: 職人数不足、応援職人来ない、熟練工休み、新人だけで進まない、複数現場掛け持ち、職長が別現場、人工割り振りミス、急な欠員、他現場へ人員移動、協力会社手配遅れ
+`;
 
 // ==================== STATE ====================
 let history = JSON.parse(localStorage.getItem('fj_history') || '[]');
-let cameraStream = null;
 let currentImageData = null;
+let apiKey = localStorage.getItem('fj_apikey') || '';
+
+// ==================== SETUP ====================
+function saveApiKey() {
+  const input = document.getElementById('apiKeyInput');
+  const key = input.value.trim();
+  if (!key) {
+    showSetupError('APIキーを入力してください');
+    return;
+  }
+  if (!key.startsWith('AIza')) {
+    showSetupError('正しいGemini APIキーを入力してください（AIza...で始まります）');
+    return;
+  }
+  apiKey = key;
+  localStorage.setItem('fj_apikey', key);
+  showScreen('screenCamera');
+  initCamera();
+}
+
+function showSetupError(msg) {
+  const el = document.getElementById('setupError');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
 
 // ==================== CAMERA ====================
 async function initCamera() {
@@ -534,7 +466,6 @@ async function initCamera() {
       video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } },
       audio: false
     });
-    cameraStream = stream;
     video.srcObject = stream;
     hint.style.display = 'none';
   } catch (e) {
@@ -551,17 +482,12 @@ function capture() {
   const w = video.videoWidth || 1280;
   const h = video.videoHeight || 720;
   canvas.width = w; canvas.height = h;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(video, 0, 0, w, h);
-  // Flash
-  const flash = document.getElementById('flash');
-  flash.classList.add('active');
-  setTimeout(() => flash.classList.remove('active'), 350);
-  // Vibrate
+  canvas.getContext('2d').drawImage(video, 0, 0, w, h);
+  document.getElementById('flash').classList.add('active');
+  setTimeout(() => document.getElementById('flash').classList.remove('active'), 350);
   if (navigator.vibrate) navigator.vibrate(50);
-
-  currentImageData = canvas.toDataURL('image/jpeg', 0.85);
-  processImage(canvas);
+  currentImageData = canvas.toDataURL('image/jpeg', 0.8);
+  processImage();
 }
 
 function handleFile(e) {
@@ -572,15 +498,13 @@ function handleFile(e) {
     const img = new Image();
     img.onload = function() {
       const canvas = document.getElementById('canvas');
-      // Resize to max 1600
       let w = img.width, h = img.height;
       if (w > 1600) { h = h * 1600 / w; w = 1600; }
       if (h > 1600) { w = w * 1600 / h; h = 1600; }
       canvas.width = w; canvas.height = h;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, w, h);
-      currentImageData = canvas.toDataURL('image/jpeg', 0.85);
-      processImage(canvas);
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      currentImageData = canvas.toDataURL('image/jpeg', 0.8);
+      processImage();
     };
     img.src = ev.target.result;
   };
@@ -588,308 +512,132 @@ function handleFile(e) {
   e.target.value = '';
 }
 
-// ==================== COLOR DETECTION ====================
-function detectColor(canvas) {
-  const ctx = canvas.getContext('2d');
-  const w = canvas.width, h = canvas.height;
-  // Sample center 60%
-  const x1 = Math.floor(w * 0.2), y1 = Math.floor(h * 0.2);
-  const x2 = Math.floor(w * 0.8), y2 = Math.floor(h * 0.8);
-  const imgData = ctx.getImageData(x1, y1, x2 - x1, y2 - y1);
-  const d = imgData.data;
-  const total = d.length / 4;
-  let redCount = 0, blueCount = 0;
+// ==================== GEMINI API ====================
+async function callGemini(base64Image) {
+  const mimeType = 'image/jpeg';
+  const imageData = base64Image.replace(/^data:image\/\w+;base64,/, '');
 
-  for (let i = 0; i < d.length; i += 16) { // Sample every 4th pixel for speed
-    const r = d[i], g = d[i+1], b = d[i+2];
-    const [hue, sat, val] = rgbToHsv(r, g, b);
-    if (sat > 0.25 && val > 0.2) {
-      if ((hue < 40 || hue > 320) && r > g && r > b) redCount++;
-      else if (hue > 190 && hue < 270 && b > r) blueCount++;
-    }
-  }
+  const body = {
+    contents: [{
+      parts: [
+        {
+          text: `あなたは建設現場の「手戻り（やり直し）」と「手待ち（待ち時間）」を分類する専門AIです。
 
-  const sampled = total / 4;
-  const redRatio = redCount / sampled;
-  const blueRatio = blueCount / sampled;
+以下の画像は建設業の勉強会で参加者が付箋に手書きした内容です。
 
-  let color = 'unknown', confidence = 0;
-  if (redRatio > blueRatio && redRatio > 0.15) {
-    color = 'red';
-    confidence = Math.min(redRatio / 0.5, 1);
-  } else if (blueRatio > redRatio && blueRatio > 0.15) {
-    color = 'blue';
-    confidence = Math.min(blueRatio / 0.5, 1);
-  }
+## あなたのタスク
+1. 付箋に書かれた手書きテキストを正確に読み取ってください
+2. その内容が「手戻り」か「手待ち」かを判定してください
+3. 以下の分類基準から最も近いカテゴリと項目を特定してください
+4. 候補を3つ挙げてください（最も近い順）
 
-  return { color, confidence, redRatio, blueRatio };
+## 判定のヒント
+- 赤い付箋 = 手戻り（やり直し）の経験
+- 青い付箋 = 手待ち（待ち時間）の経験
+- 付箋の色も判定の参考にしてください
+- 「〜し直した」「間違えた」「やり直し」→ 手戻りの可能性が高い
+- 「〜待ち」「来ない」「まだ」「使えない」→ 手待ちの可能性が高い
+
+${KB_PROMPT}
+
+## 出力形式（必ずこのJSON形式で）
+\`\`\`json
+{
+  "ocrText": "読み取ったテキスト",
+  "type": "temodori または temachi",
+  "confidence": 0-100の数値,
+  "category": "8分類のうち該当するカテゴリ名",
+  "matchItem": "最も近い具体的な原因項目",
+  "stickyColor": "red, blue, or unknown",
+  "candidates": [
+    {"category": "カテゴリ名", "item": "項目名", "score": 0-100},
+    {"category": "カテゴリ名", "item": "項目名", "score": 0-100},
+    {"category": "カテゴリ名", "item": "項目名", "score": 0-100}
+  ],
+  "reasoning": "判定理由を1文で"
 }
+\`\`\`
 
-function rgbToHsv(r, g, b) {
-  r /= 255; g /= 255; b /= 255;
-  const max = Math.max(r, g, b), min = Math.min(r, g, b);
-  const d = max - min;
-  let h = 0, s = max === 0 ? 0 : d / max, v = max;
-  if (d !== 0) {
-    if (max === r) h = ((g - b) / d + 6) % 6;
-    else if (max === g) h = (b - r) / d + 2;
-    else h = (r - g) / d + 4;
-    h *= 60;
-  }
-  return [h, s, v];
-}
-
-// ==================== OCR (Tesseract.js) ====================
-let tesseractWorker = null;
-let tesseractReady = false;
-let tesseractLoading = false;
-
-async function initTesseract() {
-  if (tesseractReady || tesseractLoading) return;
-  tesseractLoading = true;
-  try {
-    tesseractWorker = await Tesseract.createWorker('jpn', 1, {
-      logger: m => {
-        if (m.status === 'recognizing text') {
-          const pct = Math.round((m.progress || 0) * 100);
-          const s2 = document.getElementById('step2');
-          if (s2) s2.querySelector('.step-dot').nextSibling.textContent = `テキストを読み取り (${pct}%)`;
+画像に付箋が写っていない場合や文字が読み取れない場合は、ocrTextを空文字にし、typeを"unknown"としてください。`
+        },
+        {
+          inlineData: { mimeType, data: imageData }
         }
-      }
-    });
-    await tesseractWorker.setParameters({
-      tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
-    });
-    tesseractReady = true;
-    console.log('Tesseract.js ready');
-  } catch (e) {
-    console.warn('Tesseract init failed:', e);
-    tesseractReady = false;
-  }
-  tesseractLoading = false;
-}
-
-// 付箋の色に応じた前処理でOCR精度向上
-function preprocessForOCR(canvas, detectedColor) {
-  const ctx = canvas.getContext('2d');
-  const w = canvas.width, h = canvas.height;
-  const imgData = ctx.getImageData(0, 0, w, h);
-  const d = imgData.data;
-
-  const procCanvas = document.createElement('canvas');
-  procCanvas.width = w; procCanvas.height = h;
-  const pCtx = procCanvas.getContext('2d');
-  const procData = pCtx.createImageData(w, h);
-  const pd = procData.data;
-
-  // 1) 色チャネル選択でグレースケール化
-  const grayValues = new Uint8Array(w * h);
-  for (let i = 0; i < d.length; i += 4) {
-    let gray;
-    if (detectedColor === 'red') {
-      gray = d[i + 1]; // 緑チャネル（赤背景でコントラスト良好）
-    } else if (detectedColor === 'blue') {
-      gray = d[i]; // 赤チャネル（青背景でコントラスト良好）
-    } else {
-      gray = 0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2];
+      ]
+    }],
+    generationConfig: {
+      temperature: 0.1,
+      maxOutputTokens: 1024,
     }
-    grayValues[i / 4] = gray;
-  }
+  };
 
-  // 2) 大津の二値化で閾値算出
-  const histogram = new Array(256).fill(0);
-  for (let i = 0; i < grayValues.length; i++) histogram[grayValues[i]]++;
-  let total = grayValues.length, sum = 0;
-  for (let i = 0; i < 256; i++) sum += i * histogram[i];
-  let sumB = 0, wB = 0, maxVar = 0, threshold = 128;
-  for (let t = 0; t < 256; t++) {
-    wB += histogram[t]; if (wB === 0) continue;
-    const wF = total - wB; if (wF === 0) break;
-    sumB += t * histogram[t];
-    const mB = sumB / wB, mF = (sum - sumB) / wF;
-    const v = wB * wF * (mB - mF) * (mB - mF);
-    if (v > maxVar) { maxVar = v; threshold = t; }
-  }
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
 
-  // 3) 二値化適用（コントラスト強調）
-  for (let i = 0; i < grayValues.length; i++) {
-    const val = grayValues[i] < threshold ? 0 : 255;
-    const pi = i * 4;
-    pd[pi] = pd[pi+1] = pd[pi+2] = val;
-    pd[pi+3] = 255;
-  }
-
-  pCtx.putImageData(procData, 0, 0);
-  return procCanvas;
-}
-
-async function runOCR(canvas, detectedColor) {
-  if (!tesseractReady) {
-    await initTesseract();
-  }
-  if (!tesseractReady) return '';
-
-  try {
-    // 前処理済み画像でOCR
-    const processed = preprocessForOCR(canvas, detectedColor);
-    const { data } = await tesseractWorker.recognize(processed.toDataURL('image/png'));
-    // テキストをクリーンアップ
-    let text = (data.text || '').trim();
-    text = text.replace(/[\n\r]+/g, ' ').replace(/\s+/g, ' ');
-    // 短すぎるor記号だけなら空文字扱い
-    const cleaned = text.replace(/[^\p{L}\p{N}]/gu, '');
-    if (cleaned.length < 2) return '';
-    return text;
-  } catch (e) {
-    console.warn('OCR error:', e);
-    return '';
-  }
-}
-
-// ==================== KEYWORD MATCHING ====================
-function matchKeywords(text) {
-  if (!text || text.length < 2) return null;
-
-  const normalizedText = text.replace(/[\s\u3000　]/g, '').toLowerCase();
-  let bestMatch = null;
-  let bestScore = 0;
-
-  for (const [typeKey, typeData] of Object.entries(KB)) {
-    for (const [catName, items] of Object.entries(typeData.categories)) {
-      for (const item of items) {
-        const normItem = item.replace(/[\s\u3000　]/g, '').toLowerCase();
-        const score = calcSimilarity(normalizedText, normItem);
-        if (score > bestScore) {
-          bestScore = score;
-          bestMatch = { type: typeKey, category: catName, item, score };
-        }
-      }
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    if (res.status === 401 || res.status === 403) {
+      throw new Error('APIキーが無効です。設定を確認してください。');
     }
+    throw new Error(err.error?.message || `API error: ${res.status}`);
   }
 
-  // Check aruaru
-  for (const item of ARUARU) {
-    const normItem = item.replace(/[\s\u3000　]/g, '').toLowerCase();
-    const score = calcSimilarity(normalizedText, normItem);
-    if (score > bestScore) {
-      bestScore = score;
-      bestMatch = { type: 'temodori', category: '現場あるある', item, score };
-    }
-  }
+  const data = await res.json();
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
-  return bestMatch;
-}
+  // Extract JSON from response
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error('AIの応答を解析できませんでした');
 
-function calcSimilarity(a, b) {
-  if (a.length < 2 || b.length < 2) return 0;
-  // 2-gram overlap
-  const gramsA = new Set(), gramsB = new Set();
-  for (let i = 0; i < a.length - 1; i++) gramsA.add(a.slice(i, i + 2));
-  for (let i = 0; i < b.length - 1; i++) gramsB.add(b.slice(i, i + 2));
-  let overlap = 0;
-  for (const g of gramsA) if (gramsB.has(g)) overlap++;
-  return overlap / Math.max(gramsA.size, gramsB.size);
-}
-
-// Get top 3 matches
-function getTopMatches(text, typeFilter) {
-  if (!text || text.length < 2) return [];
-  const normalizedText = text.replace(/[\s\u3000　]/g, '').toLowerCase();
-  const results = [];
-
-  const searchIn = typeFilter ? { [typeFilter]: KB[typeFilter] } : KB;
-  for (const [typeKey, typeData] of Object.entries(searchIn)) {
-    for (const [catName, items] of Object.entries(typeData.categories)) {
-      for (const item of items) {
-        const normItem = item.replace(/[\s\u3000　]/g, '').toLowerCase();
-        const score = calcSimilarity(normalizedText, normItem);
-        if (score > 0.1) results.push({ type: typeKey, category: catName, item, score });
-      }
-    }
-  }
-
-  results.sort((a, b) => b.score - a.score);
-  return results.slice(0, 3);
+  return JSON.parse(jsonMatch[0]);
 }
 
 // ==================== PROCESS IMAGE ====================
-async function processImage(canvas) {
+async function processImage() {
   const proc = document.getElementById('processing');
-  const s1 = document.getElementById('step1');
-  const s2 = document.getElementById('step2');
-  const s3 = document.getElementById('step3');
-
+  const procText = document.getElementById('processingText');
   proc.classList.add('active');
-  s1.className = 'step-item active';
-  s2.className = 'step-item';
-  s3.className = 'step-item';
+  procText.textContent = 'Gemini AIが解析中...';
 
-  // Step 1: Color detection
-  await sleep(300);
-  const colorResult = detectColor(canvas);
-  s1.className = 'step-item done';
-  s2.className = 'step-item active';
-
-  // Step 2: OCR
-  let ocrText = '';
   try {
-    ocrText = await runOCR(canvas, colorResult.color);
+    const result = await callGemini(currentImageData);
+    proc.classList.remove('active');
+
+    if (result.type === 'unknown' || !result.ocrText) {
+      showResult({
+        type: 'unknown', confidence: 0, category: '', matchItem: '',
+        ocrText: result.ocrText || '', candidates: [],
+        imageData: currentImageData, reasoning: ''
+      });
+    } else {
+      showResult({
+        type: result.type,
+        confidence: result.confidence || 80,
+        category: result.category || '',
+        matchItem: result.matchItem || '',
+        ocrText: result.ocrText || '',
+        candidates: result.candidates || [],
+        imageData: currentImageData,
+        reasoning: result.reasoning || '',
+        stickyColor: result.stickyColor || 'unknown'
+      });
+    }
   } catch (e) {
-    console.warn('OCR failed:', e);
-  }
-  s2.className = 'step-item done';
-  s2.innerHTML = `<span class="step-dot"></span>テキストを読み取り${ocrText ? ' ✓' : ''}`;
-  s3.className = 'step-item active';
+    proc.classList.remove('active');
+    console.error('Gemini error:', e);
+    showToast(e.message || 'エラーが発生しました');
 
-  // Step 3: Classification
-  await sleep(200);
-  let type, confidence, category, matchItem;
-  let colorConfidence = 0;
-
-  // 色による大分類
-  if (colorResult.color === 'red') {
-    type = 'temodori';
-    colorConfidence = colorResult.confidence;
-  } else if (colorResult.color === 'blue') {
-    type = 'temachi';
-    colorConfidence = colorResult.confidence;
-  } else {
-    type = 'unknown';
-    colorConfidence = 0;
-  }
-
-  // キーワードマッチングでカテゴリ特定
-  let textScore = 0;
-  if (ocrText) {
-    const match = matchKeywords(ocrText);
-    if (match && match.score > 0.15) {
-      category = match.category;
-      matchItem = match.item;
-      textScore = match.score;
-      // 色が不明の場合、テキストから判定
-      if (type === 'unknown') {
-        type = match.type;
-      }
+    if (e.message?.includes('APIキー')) {
+      apiKey = '';
+      localStorage.removeItem('fj_apikey');
+      showScreen('screenSetup');
     }
   }
-
-  // 信頼度統合 (色60% + テキスト40%)
-  if (type !== 'unknown') {
-    confidence = Math.round(Math.min((colorConfidence * 0.6 + textScore * 0.4) * 100, 100));
-    confidence = Math.max(confidence, Math.round(colorConfidence * 100));
-  } else {
-    confidence = 0;
-  }
-
-  s3.className = 'step-item done';
-  await sleep(150);
-  proc.classList.remove('active');
-
-  // Show result
-  showResult({ type, confidence, category, matchItem, ocrText, imageData: currentImageData, colorResult });
 }
-
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 // ==================== SHOW RESULT ====================
 function showResult(result) {
@@ -898,8 +646,8 @@ function showResult(result) {
   const isUnknown = result.type === 'unknown';
 
   let confLabel = '';
-  if (result.confidence >= 70) confLabel = '高い確信度';
-  else if (result.confidence >= 40) confLabel = '中程度の確信度';
+  if (result.confidence >= 80) confLabel = '高い確信度';
+  else if (result.confidence >= 50) confLabel = '中程度の確信度';
   else if (result.confidence > 0) confLabel = '低い確信度';
 
   let html = '';
@@ -909,39 +657,22 @@ function showResult(result) {
     html += `<img class="result-image" src="${result.imageData}" alt="撮影画像">`;
   }
 
-  // OCR text or manual input
+  // OCR text
   if (result.ocrText) {
     html += `<div class="result-ocr">
       <div class="result-ocr-label">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-3-3v6m-7 4h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-        読み取りテキスト
+        AI読み取りテキスト
       </div>
       <div class="result-ocr-text">「${result.ocrText}」</div>
-    </div>`;
-  } else if (!isUnknown) {
-    html += `<div class="result-ocr">
-      <div class="result-ocr-label">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-        文字が読み取れませんでした
-      </div>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <input type="text" id="manualText" placeholder="付箋の内容を入力..."
-          style="flex:1;padding:12px 14px;border-radius:var(--radius-sm);border:1px solid var(--card-border);background:var(--bg);color:var(--text);font-size:16px;outline:none"
-          onkeydown="if(event.key==='Enter')reclassifyManual()">
-        <button onclick="reclassifyManual()"
-          style="padding:12px 18px;border-radius:var(--radius-sm);border:none;background:var(--accent);color:#000;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap">
-          判定
-        </button>
-      </div>
     </div>`;
   }
 
   if (isUnknown) {
-    // Color not detected - ask user
     html += `
       <div style="text-align:center;padding:30px 0">
         <div style="font-size:48px;margin-bottom:12px">🤔</div>
-        <div style="font-size:20px;font-weight:700;margin-bottom:8px">付箋の色を判別できませんでした</div>
+        <div style="font-size:20px;font-weight:700;margin-bottom:8px">判別できませんでした</div>
         <div style="font-size:14px;color:var(--text2);margin-bottom:24px">どちらに該当しますか？</div>
         <div style="display:flex;gap:12px">
           <button onclick="manualSelect('temodori')" style="flex:1;padding:20px 16px;border-radius:var(--radius);border:2px solid var(--red);background:var(--red-bg);color:var(--red-light);font-size:18px;font-weight:700;cursor:pointer">
@@ -965,60 +696,53 @@ function showResult(result) {
     </div>`;
 
     // Detail card
-    if (result.category || result.matchItem) {
-      html += `<div class="result-detail">`;
-      if (result.category) {
-        html += `<div class="result-detail-row">
-          <span class="detail-label">分類</span>
-          <span class="detail-value">${result.category}</span>
-        </div>`;
-      }
-      if (result.matchItem) {
-        html += `<div class="result-detail-row">
-          <span class="detail-label">類似項目</span>
-          <span class="detail-value">${result.matchItem}</span>
-        </div>`;
-      }
-      html += `</div>`;
+    html += `<div class="result-detail">`;
+    if (result.category) {
+      html += `<div class="result-detail-row">
+        <span class="detail-label">分類</span>
+        <span class="detail-value">${result.category}</span>
+      </div>`;
     }
-
-    // 類似候補TOP3
-    const topText = result.ocrText || '';
-    if (topText.length >= 2) {
-      const topMatches = getTopMatches(topText, result.type);
-      if (topMatches.length > 0) {
-        html += `<div class="result-detail">
-          <div style="font-size:13px;color:var(--text3);margin-bottom:8px">類似する原因候補</div>`;
-        topMatches.forEach((m, i) => {
-          const isActive = result.matchItem === m.item;
-          html += `<div class="result-detail-row" style="cursor:pointer;${isActive ? 'background:rgba(255,255,255,.05);border-radius:6px;padding:8px;margin:-4px -4px' : ''}" onclick="selectMatch('${m.type}','${m.category.replace(/'/g,"\\'")}','${m.item.replace(/'/g,"\\'")}')">
-            <span class="detail-label" style="width:24px;color:${isActive ? 'var(--accent)' : 'var(--text3)'}">${isActive ? '●' : (i+1)}</span>
-            <span class="detail-value" style="text-align:left">
-              <span style="font-size:14px;color:var(--text)">${m.item}</span><br>
-              <span style="font-size:12px;color:var(--text3)">${m.category}｜一致度 ${Math.round(m.score*100)}%</span>
-            </span>
-          </div>`;
-        });
-        html += `</div>`;
-      }
+    if (result.matchItem) {
+      html += `<div class="result-detail-row">
+        <span class="detail-label">最も近い項目</span>
+        <span class="detail-value">${result.matchItem}</span>
+      </div>`;
     }
+    if (result.reasoning) {
+      html += `<div class="result-detail-row">
+        <span class="detail-label">判定理由</span>
+        <span class="detail-value" style="font-size:13px;color:var(--text2)">${result.reasoning}</span>
+      </div>`;
+    }
+    if (result.stickyColor && result.stickyColor !== 'unknown') {
+      html += `<div class="result-detail-row">
+        <span class="detail-label">付箋の色</span>
+        <span class="detail-value">${result.stickyColor === 'red' ? '🔴 赤' : '🔵 青'}</span>
+      </div>`;
+    }
+    html += `</div>`;
 
-    // Color info
-    html += `<div class="result-detail">
-      <div class="result-detail-row">
-        <span class="detail-label">色検出</span>
-        <span class="detail-value">
-          ${result.colorResult.color === 'red' ? '🔴 赤（手戻り）' : '🔵 青（手待ち）'}
-        </span>
-      </div>
-      <div class="result-detail-row">
-        <span class="detail-label">判定方法</span>
-        <span class="detail-value">${result.ocrText ? '色検出 + テキスト分析' : '付箋の色から判定'}</span>
-      </div>
-    </div>`;
+    // Candidates
+    if (result.candidates && result.candidates.length > 0) {
+      html += `<div class="result-detail">
+        <div style="font-size:13px;color:var(--text3);margin-bottom:10px">類似する原因候補</div>
+        <div class="candidates-list">`;
+      result.candidates.forEach((c, i) => {
+        const selected = c.item === result.matchItem;
+        html += `<div class="candidate-item${selected ? ' selected' : ''}" onclick="selectCandidate(${i})">
+          <div>
+            <div class="candidate-name">${selected ? '● ' : (i+1)+'. '}${c.item}</div>
+            <div class="candidate-cat">${c.category}</div>
+          </div>
+          <div class="candidate-score">${c.score}%</div>
+        </div>`;
+      });
+      html += `</div></div>`;
+    }
 
     // Switch button
-    html += `<button class="btn-switch" onclick="switchType()" id="btnSwitch">
+    html += `<button class="btn-switch" onclick="switchType()">
       ${isTemodori ? '⏱ 手待ちに変更する' : '↩ 手戻りに変更する'}
       <div class="switch-hint">判定が違う場合はこちら</div>
     </button>`;
@@ -1027,7 +751,7 @@ function showResult(result) {
   body.innerHTML = html;
   body.scrollTop = 0;
 
-  // Save to history (except unknown)
+  // Save to history
   if (!isUnknown) {
     const entry = {
       id: Date.now(),
@@ -1044,67 +768,41 @@ function showResult(result) {
     updateBadge();
   }
 
-  // Store current result for switching
   window._currentResult = result;
-
   showScreen('screenResult');
 }
 
 function manualSelect(type) {
-  const result = window._currentResult;
-  result.type = type;
-  result.confidence = 100;
-  showResult(result);
+  const r = window._currentResult;
+  r.type = type;
+  r.confidence = 100;
+  showResult(r);
 }
 
-function reclassifyManual() {
-  const input = document.getElementById('manualText');
-  if (!input) return;
-  const text = input.value.trim();
-  if (!text) return;
-  const result = window._currentResult;
-  result.ocrText = text;
-  // キーワードマッチングで再判定
-  const match = matchKeywords(text);
-  if (match && match.score > 0.15) {
-    result.category = match.category;
-    result.matchItem = match.item;
-    // テキストが別タイプを示唆する場合でも色判定を優先
+function selectCandidate(idx) {
+  const r = window._currentResult;
+  if (r.candidates && r.candidates[idx]) {
+    r.category = r.candidates[idx].category;
+    r.matchItem = r.candidates[idx].item;
+    if (history.length > 0) {
+      history[0].category = r.category;
+      history[0].matchItem = r.matchItem;
+      saveHistory();
+    }
+    showResult(r);
+    showToast('候補を選択しました');
   }
-  // 履歴の最新エントリを更新
-  if (history.length > 0) {
-    history[0].ocrText = text;
-    history[0].category = result.category || '';
-    history[0].matchItem = result.matchItem || '';
-    saveHistory();
-  }
-  showResult(result);
-  showToast('テキストから分類しました');
-}
-
-function selectMatch(type, category, item) {
-  const result = window._currentResult;
-  result.category = category;
-  result.matchItem = item;
-  // 履歴も更新
-  if (history.length > 0) {
-    history[0].category = category;
-    history[0].matchItem = item;
-    saveHistory();
-  }
-  showResult(result);
-  showToast('「' + item.slice(0, 10) + (item.length > 10 ? '...' : '') + '」を選択');
 }
 
 function switchType() {
-  const result = window._currentResult;
-  result.type = result.type === 'temodori' ? 'temachi' : 'temodori';
-  result.confidence = 100;
-  // Remove the last added history entry (we'll re-add)
-  if (history.length > 0 && history[0].id === window._lastHistoryId) {
-    history.shift();
+  const r = window._currentResult;
+  r.type = r.type === 'temodori' ? 'temachi' : 'temodori';
+  r.confidence = 100;
+  if (history.length > 0) {
+    history[0].type = r.type;
+    saveHistory();
   }
-  showResult(result);
+  showResult(r);
   showToast('判定を変更しました');
 }
 
@@ -1153,11 +851,9 @@ function showHistory() {
         <div class="history-time">${item.time}</div>
       </div>`;
     }
-
     html += `</div>`;
     body.innerHTML = html;
   }
-
   body.scrollTop = 0;
   showScreen('screenHistory');
 }
@@ -1173,10 +869,8 @@ function clearHistory() {
 }
 
 function saveHistory() {
-  // Only save last 100 entries, and don't save image data to localStorage to avoid quota
   const toSave = history.slice(0, 100).map(h => ({ ...h, imageData: '' }));
   try { localStorage.setItem('fj_history', JSON.stringify(toSave)); } catch(e) {}
-  if (history.length > 0) window._lastHistoryId = history[0].id;
 }
 
 function updateBadge() {
@@ -1188,24 +882,18 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => {
     if (s.id === id) {
       s.classList.remove('hidden', 'hidden-left');
+    } else if (!s.classList.contains('hidden') && !s.classList.contains('hidden-left')) {
+      s.classList.add('hidden-left');
     } else {
-      // Current screen slides left, new screen slides in from right
-      if (!s.classList.contains('hidden') && !s.classList.contains('hidden-left')) {
-        s.classList.add('hidden-left');
-      } else {
-        s.classList.add('hidden');
-      }
+      s.classList.add('hidden');
     }
   });
 }
 
 function backToCamera() {
   document.querySelectorAll('.screen').forEach(s => {
-    if (s.id === 'screenCamera') {
-      s.classList.remove('hidden', 'hidden-left');
-    } else {
-      s.classList.add('hidden');
-    }
+    if (s.id === 'screenCamera') s.classList.remove('hidden', 'hidden-left');
+    else s.classList.add('hidden');
   });
 }
 
@@ -1219,9 +907,11 @@ function showToast(msg) {
 // ==================== INIT ====================
 window.addEventListener('DOMContentLoaded', () => {
   updateBadge();
-  initCamera();
-  // バックグラウンドでTesseract.jsの日本語モデルを先読み
-  setTimeout(() => initTesseract(), 1000);
+  if (apiKey) {
+    document.getElementById('screenSetup').classList.add('hidden');
+    document.getElementById('screenCamera').classList.remove('hidden');
+    initCamera();
+  }
 });
 </script>
 </body>
